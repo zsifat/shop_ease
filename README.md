@@ -5,9 +5,9 @@ Shopease is a modern e-commerce app built with **Flutter**. The app is designed 
 ## Screenshots
 
 <div style="display: flex; gap: 10px;">
-  <img src="screenshots/home.png" alt="Home Screen" />
-  <img src="screenshots/details.png" alt="Product Details Screen" />
-  <img src="screenshots/details2.png" alt="Product Details Screen" />
+  <img src="screenshots/home.png" alt="Home Screen" width="250" height="auto" />
+  <img src="screenshots/details.png" alt="Product Details Screen" width="250" height="auto" />
+  <img src="screenshots/details2.png" alt="Product Details Screen" width="250" height="auto" />
 </div>
 
 ## Technologies Used
