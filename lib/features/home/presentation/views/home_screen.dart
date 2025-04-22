@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 20) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - MediaQuery.of(context).size.height/2) {
         productController.fetchProducts();
       }
     });
@@ -67,10 +67,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               hintText: 'Search for products',
                               controller: searchTextController,
                               prefixIcon: Icons.search,
-                              onSubmitted: (value) {
+                              onChanged: (value) {
                                 productController.updateSearchTerm(value);
                               },
                               onClear: () {
+                                productController.clearSearchTerm();
+                              },
+                              onTextCleared: () {
                                 productController.clearSearchTerm();
                               },
                             ),

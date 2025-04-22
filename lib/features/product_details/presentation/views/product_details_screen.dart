@@ -31,6 +31,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 icon: const Icon(CupertinoIcons.star, size: 18, color: Colors.black))
           ],
         ),
+        bottomNavigationBar: CustomButton(
+        text: 'Add to Cart',
+        onPressed: () {
+        }),
         body: Container(
           width: size.width,
           height: size.height,

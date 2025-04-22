@@ -1,4 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:ecommerce_app/features/home/presentation/controllers/product_controllers.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/network/network_checker.dart';
@@ -20,6 +21,10 @@ class NetworkController extends GetxController {
     _connectivity.onConnectivityChanged.listen((List<ConnectivityResult> result) async {
       bool connectionStatus = await _networkChecker.hasConnection;
       isConnected.value = connectionStatus;
+      if (connectionStatus) {
+        final productController = Get.find<ProductController>();
+        productController.fetchProducts(isRefresh: true);
+      }
     });
   }
 

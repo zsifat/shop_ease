@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:ecommerce_app/core/theme/app_textstyles.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -28,11 +29,12 @@ class ShopEaseAppBarTitle extends StatelessWidget {
 }
 
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final String hintText;
   final IconData prefixIcon;
   final TextEditingController? controller;
-  final ValueChanged<String>? onSubmitted;
+  final ValueChanged<String>? onChanged;
+  final Function()? onTextCleared;
   final Function()? onClear;
   final bool obscureText;
   final TextInputType keyboardType;
@@ -42,32 +44,73 @@ class CustomTextField extends StatelessWidget {
     required this.hintText,
     required this.prefixIcon,
     this.controller,
-    this.onSubmitted,
+    this.onChanged,
+    this.onTextCleared,
     this.onClear,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
   });
 
   @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  late TextEditingController _controller;
+  Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = widget.controller ?? TextEditingController();
+    _controller.addListener(() {
+      setState(() {});
+      if (_controller.text.isEmpty && widget.onTextCleared != null) {
+        widget.onTextCleared!();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    if (widget.controller == null) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
+
+  void _onChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    if(value.isNotEmpty){
+      _debounce = Timer(const Duration(seconds: 1), () {
+        if (widget.onChanged != null) {
+            widget.onChanged!(value);
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller,
-      onSubmitted: onSubmitted,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
+      controller: _controller,
+      obscureText: widget.obscureText,
+      keyboardType: widget.keyboardType,
+      onChanged: _onChanged,
       decoration: InputDecoration(
         isDense: true,
-        hintText: hintText,
-        prefixIcon: Icon(prefixIcon),
-        suffixIcon: controller?.text.isNotEmpty ?? false
+        hintText: widget.hintText,
+        prefixIcon: Icon(widget.prefixIcon),
+        suffixIcon: _controller.text.isNotEmpty
             ? IconButton(
-              icon: const Icon(Icons.clear),
-              onPressed: () {
-                controller?.clear();
-                if(onClear!=null) {
-                  onClear!();
-                }
-              },
+          icon: const Icon(Icons.clear),
+          onPressed: () {
+            _controller.clear();
+            if (widget.onClear != null) {
+              widget.onClear!();
+            }
+          },
         )
             : null,
         border: OutlineInputBorder(
@@ -209,4 +252,34 @@ class RatingWidget extends StatelessWidget {
   }
 }
 
+class CustomButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+  final bool isCancel;
+  const CustomButton({super.key, required this.text, required this.onPressed, this.isCancel =false});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 46,
+      margin: const EdgeInsets.symmetric(horizontal: 10.0,vertical: 10),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: !isCancel ? const Color(0xFF6B4EFF) : const Color(0xFFF4F4F6),
+            side: isCancel ? const BorderSide(color: Color(0xFF6B4EFF) ) : BorderSide.none,
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(48)),
+            fixedSize: const Size(double.infinity, double.infinity)),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: GoogleFonts.inter(
+            fontWeight: FontWeight.w400,
+            color: isCancel ?  const Color(0xFF6B4EFF) :Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+}
 
